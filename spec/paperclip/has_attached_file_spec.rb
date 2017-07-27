@@ -58,6 +58,16 @@ describe Paperclip::HasAttachedFile do
     it 'does define a media_type check if told to' do
       assert_adding_attachment('avatar').sets_up_media_type_check_validation
     end
+
+    context 'when use_paranoia_callbacks is true' do
+      it 'defines an after_real_destroy callback' do
+        assert_adding_attachment('avatar').defines_callback('after_real_destroy', use_paranoia_callbacks: true)
+      end
+
+      it 'defines a before_real_destroy callback' do
+        assert_adding_attachment('avatar').defines_callback('before_real_destroy', use_paranoia_callbacks: true)
+      end
+    end
   end
 
   private
@@ -114,10 +124,10 @@ describe Paperclip::HasAttachedFile do
       expect(Paperclip::AttachmentRegistry).to have_received(:register).with(a_class, @attachment_name, {size: 1})
     end
 
-    def defines_callback(callback_name)
+    def defines_callback(callback_name, options = {})
       a_class = @stubbed_class
 
-      Paperclip::HasAttachedFile.define_on(a_class, @attachment_name, {})
+      Paperclip::HasAttachedFile.define_on(a_class, @attachment_name, options)
 
       expect(a_class).to have_received(callback_name.to_sym)
     end
@@ -146,8 +156,10 @@ describe Paperclip::HasAttachedFile do
            define_method: nil,
            after_save: nil,
            before_destroy: nil,
+           before_real_destroy: nil,
            after_commit: nil,
            after_destroy: nil,
+           after_real_destroy: nil,
            define_paperclip_callbacks: nil,
            extend: nil,
            name: 'Billy',

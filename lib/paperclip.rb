@@ -179,6 +179,8 @@ module Paperclip
     #   choices are :filesystem, :fog and :s3. The default is :filesystem. Make sure you read the
     #   documentation for Paperclip::Storage::Filesystem, Paperclip::Storage::Fog and Paperclip::Storage::S3
     #   for backend-specific options.
+    # * +use_paranoia_callbacks+ - use callbacks that are compatible with Paranoia gem. When a record is
+    #   soft deleted, the attachment will be preserved. It will only be removed when the record is hard deleted.
     #
     # It's also possible for you to dynamically define your interpolation string for :url,
     # :default_url, and :path in your model by passing a method name as a symbol as a argument

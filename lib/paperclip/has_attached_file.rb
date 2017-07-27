@@ -89,7 +89,19 @@ module Paperclip
 
     def add_active_record_callbacks
       name = @name
+
       @klass.send(:after_save) { send(name).send(:save) }
+
+      if @options[:use_paranoia_callbacks]
+        add_paranoia_destroy_callbacks
+      else
+        add_active_record_destroy_callbacks
+      end
+    end
+
+    def add_active_record_destroy_callbacks
+      name = @name
+
       @klass.send(:before_destroy) { send(name).send(:queue_all_for_delete) }
       if @klass.respond_to?(:after_commit)
         @klass.send(:after_commit, on: :destroy) do
@@ -98,6 +110,13 @@ module Paperclip
       else
         @klass.send(:after_destroy) { send(name).send(:flush_deletes) }
       end
+    end
+
+    def add_paranoia_destroy_callbacks
+      name = @name
+
+      @klass.send(:before_real_destroy) { send(name).send(:queue_all_for_delete) }
+      @klass.send(:after_real_destroy) { send(name).send(:flush_deletes) }
     end
 
     def add_paperclip_callbacks
